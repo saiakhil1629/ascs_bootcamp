@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ASCS Campus Bootcamp | Data Analytics Using Python</title>
+  <style>
+    :root{
+      --bg: #070A12;
+      --card: rgba(255,255,255,.06);
+      --card2: rgba(255,255,255,.10);
+      --stroke: rgba(255,255,255,.12);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.72);
+      --muted2: rgba(255,255,255,.55);
+      --accent1: #7C3AED; /* violet */
+      --accent2: #06B6D4; /* cyan */
+      --accent3: #22C55E; /* green */
+      --shadow: 0 22px 70px rgba(0,0,0,.55);
+      --radius: 18px;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background:
+        radial-gradient(900px 450px at 15% 20%, rgba(124,58,237,.25), transparent 60%),
+        radial-gradient(900px 450px at 85% 25%, rgba(6,182,212,.22), transparent 60%),
+        radial-gradient(900px 450px at 55% 90%, rgba(34,197,94,.14), transparent 60%),
+        linear-gradient(180deg, #050816, #070A12 55%, #050816);
+      color:var(--text);
+      min-height:100vh;
+    }
+
+    a{ color: inherit; }
+    .container{ max-width:1200px; margin:0 auto; padding:24px; }
+
+    /* Splash / Loader */
+    #splash{
+      position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+      background:
+        radial-gradient(900px 450px at 20% 20%, rgba(124,58,237,.25), transparent 60%),
+        radial-gradient(900px 450px at 80% 25%, rgba(6,182,212,.20), transparent 60%),
+        linear-gradient(180deg, #040615, #070A12);
+      z-index:9999;
+      overflow:hidden;
+    }
+    .splash-card{
+  width: 100%;
+  max-width: 860px;
+  padding: 24px;
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;          /* ✅ allows stacking on mobile */
+}
+
+    .splash-left{ display:flex; gap:18px; align-items:center; }
+    .logo{
+      width:180px; height:auto; filter: drop-shadow(0 12px 30px rgba(0,0,0,.6));
+    }
+    .brand h1{
+      margin:0;
+      font-size: clamp(20px, 3vw, 30px);
+      letter-spacing:.4px;
+    }
+    .brand p{ margin:6px 0 0; color:var(--muted); }
+    .pulse{
+      width:160px; height:10px; border-radius:999px;
+      background: linear-gradient(90deg, rgba(124,58,237,.15), rgba(6,182,212,.65), rgba(34,197,94,.35));
+      position:relative; overflow:hidden;
+    }
+    .pulse::after{
+      content:""; position:absolute; top:0; left:-40%;
+      width:40%; height:100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.7), transparent);
+      animation: shimmer 1.2s infinite;
+    }
+    @keyframes shimmer { to { left:110%; } }
+
+    /* App */
+    #app{ display:none; }
+    header{
+      display:flex; gap:16px; align-items:flex-end; justify-content:space-between;
+      padding:16px 0 10px;
+    }
+    .title h2{
+      margin:0;
+      font-size: clamp(22px, 3.5vw, 42px);
+      line-height:1.1;
+    }
+    .title .sub{
+      margin:8px 0 0;
+      color:var(--muted);
+      max-width: 70ch;
+    }
+    .chip-row{ display:flex; gap:10px; flex-wrap:wrap; }
+    .chip{
+      padding:10px 12px;
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.05);
+      border-radius:999px;
+      color:var(--muted);
+      font-size: 13px;
+    }
+    .chip strong{ color:var(--text); }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:18px;
+      margin-top:16px;
+    }
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      border:1px solid var(--stroke);
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .card h3{ margin:0 0 10px; }
+    .card .p{ color:var(--muted); margin:0; }
+
+    /* Teams Grid */
+    .teams{
+      padding:18px;
+    }
+    .teams-top{
+      display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+    .teams-top .hint{ color:var(--muted2); font-size: 13px; }
+
+    .team-grid{
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap:12px;
+    }
+    @media (max-width: 980px){
+      .team-grid{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+    @media (max-width: 640px){
+      .team-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    .team-btn{
+      cursor:pointer;
+      padding:14px 12px;
+      border-radius: 14px;
+      border:1px solid var(--stroke);
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+      text-align:left;
+      position:relative;
+      overflow:hidden;
+    }
+    .team-btn:hover{
+      transform: translateY(-3px);
+      border-color: rgba(6,182,212,.45);
+      background: linear-gradient(180deg, rgba(6,182,212,.10), rgba(124,58,237,.06));
+    }
+    .team-name{
+  font-weight: 700;
+  color: #ffffff;              /* ✅ force white */
+}
+
+    .team-mini{
+  margin-top:6px;
+  color: rgba(255,255,255,0.75);   /* ✅ readable light text */
+  font-size: 12.5px;
+}
+/* ===== TEAM CARD TEXT VISIBILITY FIX ===== */
+.team-btn{
+  color: #ffffff;   /* ensures all text inside is visible */
+}
+
+
+
+    /* Team Detail */
+    .detail{
+      padding:18px;
+    }
+    .detail-head{
+      display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .badge{
+      font-size:12px;
+      padding:8px 10px;
+      border-radius: 999px;
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.05);
+      color: var(--muted);
+    }
+    .hero-img{
+      width:100%;
+      aspect-ratio: 16/9;
+      border-radius: 16px;
+      border:1px solid var(--stroke);
+      background:
+        radial-gradient(500px 200px at 20% 20%, rgba(124,58,237,.25), transparent 60%),
+        radial-gradient(500px 200px at 80% 25%, rgba(6,182,212,.18), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      display:flex; align-items:center; justify-content:center;
+      overflow:hidden;
+      margin:12px 0 14px;
+    }
+    .hero-img img{
+      width:100%; height:100%; object-fit:cover; display:block;
+    }
+    .links{ display:flex; gap:10px; flex-wrap:wrap; margin:10px 0 6px; }
+    .btn{
+      text-decoration:none;
+      padding:10px 12px;
+      border-radius: 12px;
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      transition: transform .16s ease, border-color .16s ease;
+      display:inline-flex; gap:8px; align-items:center;
+      font-size: 14px;
+    }
+    .btn:hover{ transform: translateY(-2px); border-color: rgba(124,58,237,.55); }
+
+    ul{ margin:10px 0 0; padding-left:18px; color: var(--muted); }
+    .muted{ color: var(--muted); }
+
+    /* Outcomes & Tools */
+    .section{
+      margin-top:18px;
+      padding:18px;
+    }
+    .section-grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px;
+    }
+    @media (max-width: 980px){ .section-grid{ grid-template-columns: 1fr; } }
+
+    .tool-row{
+      display:flex; flex-wrap:wrap; gap:10px;
+      margin-top:12px;
+    }
+    .tool{
+      padding:10px 12px;
+      border-radius: 999px;
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.05);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    footer{
+      margin:22px 0 10px;
+      color: var(--muted2);
+      font-size: 13px;
+      text-align:center;
+    }
+    /* ===== Splash Mobile Fix ===== */
+@media (max-width: 600px) {
+  .splash-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .splash-left {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .logo {
+    width: 140px;           /* smaller logo for mobile */
+  }
+
+  .pulse {
+    margin: 12px auto 0;
+  }
+
+  .splash-card > div:last-child {
+    display: none;          /* hide "Loading..." text on mobile */
+  }
+}
+
+/* ===== TOP LOGO BAR ===== */
+.topbar{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;     /* ⬅️ space around logos */
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--stroke);
+}
+
+
+/* ===== LOGO SIZE FIX ===== */
+.logo-main{
+  height: 64px;          /* ⬅️ BIGGER & CLEAR */
+  width: auto;
+}
+
+.logo-circle{
+  width: 52px;           /* ⬅️ NOT SMALL */
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--stroke);
+  background: rgba(255,255,255,.08);
+}
+
+
+/* Mobile tweak */
+@media (max-width: 600px){
+  .logo-main{
+    height: 34px;
+  }
+  .logo-circle{
+    width: 30px;
+    height: 30px;
+  }
+}
+/* ===== MOBILE LOGO FIX ===== */
+@media (max-width: 600px){
+  .logo-main{
+    height: 52px;
+  }
+
+  .logo-circle{
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* ===== BOOTCAMP HIGHLIGHTS (NEW SECTION ONLY) ===== */
+
+.bootcamp-highlights {
+  overflow: hidden;
+}
+
+.highlights-wrapper {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  border-radius: 16px;
+}
+
+.highlights-track {
+  display: flex;
+  gap: 18px;
+  width: max-content;
+  animation: highlightScroll 32s linear infinite;
+}
+
+.highlights-track img {
+  width: 260px;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid var(--stroke);
+  box-shadow: var(--shadow);
+  transition: transform .35s ease, box-shadow .35s ease;
+}
+
+/* Hover effect */
+.highlights-track img:hover {
+  transform: scale(1.06);
+  box-shadow: 0 18px 50px rgba(0,0,0,.6);
+}
+
+/* Pause animation on hover */
+.highlights-wrapper:hover .highlights-track {
+  animation-play-state: paused;
+}
+
+/* Animation */
+@keyframes highlightScroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .highlights-track img {
+    width: 200px;
+    height: 130px;
+  }
+}
+
+
+  </style>
+</head>
+
+<body>
+
+ <!-- Top Logo Bar -->
+<div class="topbar">
+  <img src="adhoc-removebg-preview.png" alt="Company Logo" class="logo-main">
+
+  <img src="aditya.jpg" alt="Profile Logo" class="logo-circle">
+</div>
+
+
+  <!-- Splash Screen (7s) -->
+  <div id="splash">
+    <div class="splash-card">
+      <div class="splash-left">
+        <img class="logo" alt="ADHOC NETWORK Logo"
+          src="adhoc-removebg-preview.png" />
+        <div class="brand">
+          <h1>By SaiAkhil</h1>
+          <p>Project Day Bootcamp • Data Analytics Using Python</p>
+          <div style="margin-top:14px" class="pulse"></div>
+        </div>
+      </div>
+      <div style="text-align:right; color:var(--muted); font-size:13px; line-height:1.4;">
+        Loading bootcamp overview…<br/>
+        Please wait 7 seconds
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div id="app" class="container">
+
+    <header>
+      <div class="title">
+        <h2>Welcome to <span style="background: linear-gradient(90deg, var(--accent2), var(--accent1)); -webkit-background-clip:text; background-clip:text; color:transparent;">The ASCS Campus Bootcamp</span></h2>
+        <p class="sub">
+          <strong>DATA ANALYTICS USING PYTHON</strong> – Project Day Bootcamp (2 Days). One of the hands-on experience bootcamps to build real projects, collaborate in teams, and present outcomes.
+        </p>
+      </div>
+
+      <div class="chip-row" aria-label="Bootcamp Stats">
+        <div class="chip"><strong>123</strong> Members</div>
+        <div class="chip"><strong>20</strong> Teams</div>
+        <div class="chip"><strong>2</strong> Sections</div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- Teams -->
+      <section class="card teams">
+        <div class="teams-top">
+          <div>
+            <h3 style="margin:0;">Teams</h3>
+            <div class="hint">Click any team to view their project, image, links & members.</div>
+          </div>
+          <div class="badge">Hands-on Experience Bootcamp</div>
+        </div>
+
+        <div id="teamGrid" class="team-grid"></div>
+      </section>
+
+      <!-- Team Detail -->
+      <aside class="card detail">
+        <div class="detail-head">
+          <div>
+            <h3 id="teamTitle" style="margin:0;">Select a Team</h3>
+            <div id="teamSubtitle" class="muted" style="margin-top:6px;">Team project details will appear here.</div>
+          </div>
+          <div id="teamTag" class="badge">Team View</div>
+        </div>
+
+        <div class="hero-img" id="teamImageWrap" title="Team image">
+          <div class="muted" style="padding:18px; text-align:center;">
+            Team Image Preview Area (16:9)
+          </div>
+        </div>
+
+        <p id="teamDesc" class="p">Pick a team from the left to show the project matter, Git link, PPT link, and member names.</p>
+
+        <div class="links">
+          <a id="gitLink" class="btn" href="#" target="_blank" rel="noopener">GitHub Link</a>
+          <a id="pptLink" class="btn" href="#" target="_blank" rel="noopener">PPT Link</a>
+        </div>
+
+        <div style="margin-top:10px;">
+          <strong>Team Members</strong>
+          <ul id="memberList"></ul>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Outcomes + Tools -->
+    <section class="card section">
+      <h3 style="margin:0 0 10px;">Bootcamp Outcomes & Tools</h3>
+
+      <div class="section-grid">
+        <div class="card" style="padding:16px; background: var(--card2); border-radius: 16px;">
+          <h4 style="margin:0 0 8px;">Outcomes (2 Days)</h4>
+          <ul>
+            <li>Built end-to-end mini data analytics projects</li>
+            <li>Cleaned & transformed datasets using Python</li>
+            <li>Explored insights through charts & summary statistics</li>
+            <li>Presented findings with PPT + Git repository</li>
+            <li>Team collaboration, role splitting, and final demo</li>
+          </ul>
+        </div>
+
+        <div class="card" style="padding:16px; background: var(--card2); border-radius: 16px;">
+          <h4 style="margin:0 0 8px;">Tools Used </h4>
+          <p class="p">Different Use Different Tools to Built.</p>
+          <div class="tool-row" id="toolRow">
+            <span class="tool">Python</span>
+            <span class="tool">Pandas</span>
+            <span class="tool">NumPy</span>
+            <span class="tool">Matplotlib</span>
+            <span class="tool">Seaborn</span>
+            <span class="tool">Jupyter</span>
+            <span class="tool">Git</span>
+            <span class="tool">GitHub</span>
+            <span class="tool">HTML</span>
+            <span class="tool">CSS</span>
+            <span class="tool">Javascript</span>
+            
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- ================= BOOTCAMP HIGHLIGHTS SHOWCASE ================= -->
+<section class="card section bootcamp-highlights">
+  <h3 style="margin-bottom:6px;">Bootcamp Highlights & Moments</h3>
+  <p class="p" style="margin-bottom:14px;">
+    A visual glimpse of teamwork, learning, and hands-on innovation during the
+    <strong>Data Analytics Using Python</strong> Project Day Bootcamp.
+  </p>
+
+  <div class="highlights-wrapper">
+    <div class="highlights-track">
+      <!-- 🔹 ADD YOUR 8 IMAGES HERE -->
+      <img src="01.JPG" alt="Bootcamp highlight">
+      <img src="02.jpeg" alt="Bootcamp highlight">
+      <img src="03.jpeg" alt="Bootcamp highlight">
+      <img src="04.JPG" alt="Bootcamp highlight">
+      <img src="05.jpg" alt="Bootcamp highlight">
+      <img src="06.jpg" alt="Bootcamp highlight">
+      <img src="07.JPG" alt="Bootcamp highlight">
+      <img src="08.jpg" alt="Bootcamp highlight">
+
+      <!-- duplicate for smooth loop -->
+      <img src="images/highlight1.jpg" alt="">
+      <img src="images/highlight2.jpg" alt="">
+      <img src="images/highlight3.jpg" alt="">
+      <img src="images/highlight4.jpg" alt="">
+      <img src="images/highlight5.jpg" alt="">
+      <img src="images/highlight6.jpg" alt="">
+      <img src="images/highlight7.jpg" alt="">
+      <img src="images/highlight8.jpg" alt="">
+    </div>
+  </div>
+</section>
+
+    
+
+    <footer>
+      © ASCS Campus Bootcamp • Data Analytics Using Python • Built for Project Day Overview
+    </footer>
+  </div>
+
+  <script>
+    // --- Splash: show 7 seconds ---
+    window.addEventListener("load", () => {
+      setTimeout(() => {
+        document.getElementById("splash").style.display = "none";
+        document.getElementById("app").style.display = "block";
+      }, 7000);
+    });
+
+    // --- Demo Team Data (replace with your real 20 teams) ---
+   const teams = [
+  {
+    id: 1,
+    name: "Team 01 - Himakar's Team",
+    section: "Section C",
+    image: "D:\\Finalbootcamp\\team01.jpeg",
+    desc: "Student Performance Analysis: Analyze student grades to find correlations between study hours and final scores.",
+    git: "https://github.com/lokeshkondeti02-boop/IT-SOLUTIONNS-.git",
+    ppt: "https://drive.google.com/open?id=1-ubw7OPWzp_7XsfhJbw60gBb_GlELRY0",
+    members: ["Muramalla Himakar", "Ambati Krishna Venkata Kishore", "Palika Jaydheer", "Kandukuri Vijay", "Gorle Lalitha Siva Prasad", "Lanka Sai Charan"]
+  },
+  {
+    id: 2,
+    name: "Team 02 - Data Dreamers",
+    section: "Section C",
+    image: "D:\\Finalbootcamp\\team2.jpeg",
+    desc: "YouTube/Instagram Engagement Analysis: Compare likes/comments/views across posts and find best posting time.",
+    git: "https://github.com/lohithareddy1432/Data-Dreamer-s",
+    ppt: "https://drive.google.com/open?id=1sY9P9ePKOGf1J8ejlg0ffZHkYzeUEMjw",
+    members: ["Lakshmi Lohitha", "Anusha", "Vyshnavi", "Padmaja", "Dileep", "Abhishek"]
+  },
+  {
+    id: 3,
+    name: "Team 03 - DEVELOPERS",
+    section: "Section C",
+    image: "team03.jpg",
+    desc: "IPL Cricket Statistics: Analyze player performance and team win rates across IPL seasons.",
+    git: "https://github.com/anudeep-cmd-commits/HEMANTH",
+    ppt: "https://drive.google.com/open?id=1yzEQUat8P0-n1wddv-LWDRfa5BWnDs7q",
+    members: ["Sai Hemanth", "BALA VASANTH KUMAR", "Venkat naveen", "Jaya ram","Anudeep","Ch siva"]
+  },
+    {
+        id: 4,
+        name: "Team 04 - LOGIC LANCERS",
+        section: "Section C",
+        image: "team4.jpg",
+        desc: "Movie Rating Analysis: Analyze IMDB/Netflix datasets to find highest-rated genres over the last decade.",
+        git: "https://github.com/ashishx91/movie-rating-analysis",
+        ppt: "https://drive.google.com/open?id=1CGJi_N6sRHbRINpA7uPWAYa2eSR6fim2",
+        members: ["ASHISH", " INDUMATHI", "PRANATHI", "MOUNIKA", "SUREKHA","VENKAT KUMAR",]
+      },    
+      {
+        id: 5,
+        name: "Team 05 - Legacy Avengers",
+        section: "Section C",
+        image: "D:\\Finalbootcamp\\team5.jpeg",
+        desc: "Placement Tracker Dashboard: Analyze placement data (company, package, skills) to find top skills and outcomes.",
+        git: "https://github.com/sirishaguttula07/placement-metrics-dashboard.git",
+        ppt: "https://drive.google.com/open?id=1hEZCk7uD1Fl1ER1yVgPOBYn3fpg395iO",
+        members: ["Guttula Sirisha", "Kona Sravani", "Kusuma Sri Navya Siriki", "Dunna Akhila", "Haritha sri mahalakshmi","Arigela Deepika Mahalakshmi"]
+      },
+      {
+    id: 6,
+    name: "Team 06 - Programmer's",
+    section: "Section C",
+    image: "D:\\Finalbootcamp\\team06.jpeg",
+    desc: "Campus Event Feedback Analysis: Analyze survey ratings/comments to summarize satisfaction and key issues.",
+    git: "https://github.com/Tapasyas67/Feedback-.git",
+    ppt: "https://drive.google.com/open?id=1OJey1yb-1uaIz2uZeMMF3tVfick7uHnl",
+    members: ["S. Tapasya", "Aswathy Nair", "Aswini Nair", "G. Varshini", "G. Rohith","M. Saritha"]
+  },
+   
+    {
+    id: 7,
+    name: "Team 07 - IT SOLUTION'S",
+    section: "Section C",
+    image: "D:\\Finalbootcamp\\team7.jpeg",
+    desc: "Credit Card Fraud Detection: Analyze transactions to identify fraud patterns.",
+    git: "https://github.com/lokeshkondeti02-boop/IT-SOLUTIONNS-.git",
+    ppt: "https://drive.google.com/open?id=1eJkjmb8-LakFxvAifMKKenZdZhzO6wqy",
+    members: ["Lokesh", "Raja", "Praveen", "Venkat durga", "Tatwik", "Chaitanya"]
+  },
+  {
+    id: 8,
+    name: "Team 08 - Manoj's Team",
+    section: "Section C",
+    image: "D:\\Finalbootcamp\\team08.jpg",
+    desc: "Zomato Restaurant Analysis: Find popular cuisines and average costs in specific urban areas.",
+    git: "https://github.com/likithchowdary306-eng/Zomato",
+    ppt: "https://drive.google.com/open?id=1MKTeh2YGVpYLGOvihP41fu8QQNPys9gE",
+    members: ["G. Manoj", "Surya manikanta", "S.Sriram", "K.Likith chowdhury", "Pavani", "P.Gangadhar"]
+  },
+  {
+    id: 9,
+    name: "Team 09 - Reboot Rebels",
+    section: "Section D",
+    image: "D:\\Finalbootcamp\\team09.jpg",
+    desc: "E-commerce Product Review Sentiment: Basic text analysis to label reviews as Positive/Negative/Neutral.",
+    git: "https://shyam-prasad-pantagada.github.io/e-commerce-product-review-analysis/",
+    ppt: "https://drive.google.com/open?id=1XOYLHXIOxZ0D9lMij5e8UglVMRSUkIV8",
+    members: ["Shyam Prasad", "Yashwanth", "Satish", "Manikanta","Raju","Shafiq"]
+  },
+  {
+    id: 10,
+    name: "Team 10 - Rajeswari's team",
+    section: "Section D",
+    image: "https://your-site.com/images/team02.jpg",
+    desc: "Library Book Issue Analysis: Identify most issued books, peak borrowing months, and student borrowing trends.",
+    git: "https://github.com/Rajeswari214-4/library-book-issue-analysis",
+    ppt: "https://drive.google.com/open?id=1LRjgSCGFOcTcDkqAaESvOUaqo01ilaSB",
+    members: ["Nimmana Venkata Raja Rajeswari", "Srilakshmi chavvakula", "Chammangi. ujwala Kranthi", "Doodi.Daiva preethi","N.viswanadhreddy","K.krishna vamsi"]
+  },
+  {
+    id: 11,
+    name: "Team 11 - Code Crafters",
+    section: "Section D",
+    image: "https://your-site.com/images/team02.jpg",
+    desc: "COVID-19 Vaccination Progress: Track vaccination rates and visualize trends.",
+    git: "https://github.com/harshitha-rasamsetti/COVID-19-Progress-Analysis",
+    ppt: "https://drive.google.com/open?id=1Ui_f4Xp09HuRQfHkHS3AfU7gkp1Wno19",
+    members: ["Gopi Varshini Raghavalli", "Pappala Bhanu Sri", "Gonigantala Tejaswini Sri Satya Aparna", "Gosula Sai Lakshmi Rama Varshitha","Chinthala Mounika","Rasamsetti Sai Harshitha"]
+  },
+  {
+    id: 12,
+    name: "Team 12 - Lazy bugs",
+    section: "Section D",
+    image: "https://your-site.com/images/team02.jpg",
+    desc: "Traffic Accident EDA: Analyze accident dataset to find hotspots, time-of-day risk, and common causes.",
+    git: "https://github.com/Kottu-Sushma/Traffic_Accident.git",
+    ppt: "https://drive.google.com/open?id=1OQAqG0zWsoEw7QqFHViforx4TgnwGzsC",
+    members: ["Kottu sushma", "Duvvuri Sri Sai Sindhuja", "Tattaputtikala Sai Pranathi", "Baddili Charishma","Elubandi Sri vyshnavi","Koonisetti Divya Sri"]
+  },
+  {
+    id: 13,
+    name: "Team 13 - ByteSquad",
+    section: "Section D",
+    image: "https://your-site.com/images/team02.jpg",
+    desc: "Bus/Transport Route Analysis: Analyze pickup/drop timings to find delays and optimize routes.",
+    git: "https://github.com/your-org/team02-churn",
+    ppt: "https://drive.google.com/open?id=1XOYLHXIOxZ0D9lMij5e8UglVMRSUkIV8",
+    members: ["Sandeep Batte", "Suneel kyanam", "Rishi kalyan kakara", "Srikar kuchi","Ch Nani","B.G.V.S. Prudhvi"]
+  },
+  {
+    id: 14,
+    name: "Team 14 - Innovision",
+    section: "Section D",
+    image: "team14.jpg",
+    desc: "Real Estate Price Prediction: Study how location, size, and age affect property prices.",
+    git: "https://github.com/karthikeyaabhiram/INNOVISION-s-BOOT-CAMP-ACTIVITY.git",
+    ppt: "https://drive.google.com/open?id=1SMXzF_-lJPrlio8K_OFUCN7cFxpt0XU1",
+    members: ["Abhiram Gurudanthi", "Rajkumar Sunkara", "Bhadra Gokeda", "Prachothana Annamneedi","Sai Akhil Gandepalli","Seshidhar Giduturi"]
+  },
+  {
+    id: 15,
+    name: "Team 15 - Sriharsha team",
+    section: "Section D",
+    image: "team15.jpg",
+    desc: "Electricity Usage Analysis: Analyze hostel/classroom electricity usage and identify peak consumption time.",
+    git: "https://github.com/joshua1810/Electricity_Consumption",
+    ppt: "https://drive.google.com/open?id=1RPZNvuxXTARZlQYrKQfAIfEAJ6Ed7IhD",
+    members: ["Gedela Sriharsha", "V Sri Aditya", "Ch Vishnu Vardhan Reddy", "G Joshua","A. Siva","P.Chakradar"]
+  },
+  {
+    id: 16,
+    name: "Team 16 - Tony Stark",
+    section: "Section D",
+    image: "team16.jpg",
+    desc: "Customer Segmentation: Use K-Means to group customers based on spending habits.",
+    git: "https://github.com/GuntamukkalaRamyasri/customer-segmentation",
+    ppt: "https://drive.google.com/open?id=1szU0I_drvN2UPP-O3tSLWMW3mPGumqZ9",
+    members: ["Manam Karthikeya", "K Tanuja Sri", "P Sameera", "G Deva Kumari","Allu Rajesh"]
+  },
+  {
+    id: 17,
+    name: "Team 17 - Blacks",
+    section: "Section D",
+    image: "https://your-site.com/images/team02.jpg",
+    desc: "HR Analytics: Analyze employee turnover data and factors affecting attrition.",
+    git: "------",
+    ppt: "https://drive.google.com/open?id=1rh_CmCfE92VZqzeCwlV1X-qAEyr6Y-9P",
+    members: ["Tanyaradzwa", "Abijar", "Elias", "Takudzwa","Tony"]
+  },
+  {
+    id: 19,
+    name: "Team 19 - Pystorm",
+    section: "Section D",
+    image: "team19.jpg",
+    desc: "Credit Card Fraud Detection: Analyze transactions to identify fraud patterns.",
+    git: "https://github.com/StacyElizabeth/CCF.git",
+    ppt: "https://drive.google.com/open?id=12bnOpOFgEiTmlMYuMQr4rEPrGOfCgB0H",
+    members: ["Geddada Harika Sai Bhavani", "Gollapalli Bhuvana Pranathi", "Elubandi Sri Vyshnavi", "Kunjam venkata satya priya","Kella Harshavardhini","Y Stacy Elizabeth"]
+  },
+  {
+    id: 20,
+    name: "Team 20 - The boys",
+    section: "Section D",
+    image: "team20.jpg",
+    desc: "Simple Loan Eligibility EDA: Explore loan datasets to find patterns in approval vs income/credit history.",
+    git: "https://github.com/Valli-143/loan-repo",
+    ppt: "https://drive.google.com/open?id=1LDLD-wAUYToJ9Psg7u-LC6qig3LGSLVu",
+    members: ["GURAJAPU VALLIBABA", "Yadagiri praveen Jyothi kumar", "Narala sudheer", "Kuthuru devisri harsha vardhan karthik","Sri ram"]
+  },
+          
+];
+
+    const teamGrid = document.getElementById("teamGrid");
+
+    function renderTeams(){
+      teamGrid.innerHTML = "";
+      teams.forEach(t => {
+        const btn = document.createElement("button");
+        btn.className = "team-btn";
+        btn.innerHTML = `
+          <div class="team-name">${t.name}</div>
+          <div class="team-mini">${t.section} • Click to view</div>
+        `;
+        btn.addEventListener("click", () => showTeam(t.id));
+        teamGrid.appendChild(btn);
+      });
+    }
+
+    function showTeam(id){
+      const t = teams.find(x => x.id === id);
+      document.getElementById("teamTitle").textContent = t.name;
+      document.getElementById("teamSubtitle").textContent = t.section + " • DATA ANALYTICS USING PYTHON";
+      document.getElementById("teamTag").textContent = "Selected";
+
+      // Image
+      const wrap = document.getElementById("teamImageWrap");
+      wrap.innerHTML = "";
+      if(t.image && t.image.trim().length > 0){
+        const img = document.createElement("img");
+        img.src = t.image;
+        img.alt = t.name + " team image";
+        wrap.appendChild(img);
+      } else {
+        wrap.innerHTML = `<div class="muted" style="padding:18px; text-align:center;">
+          No team image yet. Add an image URL in the data.
+        </div>`;
+      }
+
+      document.getElementById("teamDesc").textContent = t.desc;
+
+      const git = document.getElementById("gitLink");
+      const ppt = document.getElementById("pptLink");
+
+      git.href = t.git || "#";
+      ppt.href = t.ppt || "#";
+
+      // Members
+      const ul = document.getElementById("memberList");
+      ul.innerHTML = "";
+      (t.members || []).forEach(m => {
+        const li = document.createElement("li");
+        li.textContent = m;
+        ul.appendChild(li);
+      });
+    }
+
+    renderTeams();
+  </script>
+</body>
+</html>
