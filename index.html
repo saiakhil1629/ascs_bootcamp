@@ -388,6 +388,65 @@
     height: 130px;
   }
 }
+/* ===== CEO MESSAGE SECTION ===== */
+
+.ceo-message {
+  margin-top: 24px;
+}
+
+.ceo-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 28px;
+  align-items: center;
+}
+
+.ceo-photo {
+  display: flex;
+  justify-content: center;
+}
+
+.ceo-photo img {
+  width: 240px;
+  height: 240px;
+  object-fit: cover;
+  border-radius: 20px;
+  border: 1px solid var(--stroke);
+  box-shadow: var(--shadow);
+}
+
+.ceo-content h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+.ceo-content .p {
+  margin-bottom: 12px;
+}
+
+.ceo-sign {
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .ceo-grid {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .ceo-photo img {
+    width: 180px;
+    height: 180px;
+  }
+
+  .ceo-sign {
+    margin-top: 16px;
+  }
+}
 
 
   </style>
@@ -551,6 +610,32 @@
       <img src="images/highlight8.jpg" alt="">
     </div>
   </div>
+   <!-- CEO MESSAGE -->
+    <div class="ceo-content">
+      <h3>Message from the CEO</h3>
+      <p class="p">
+        The <strong>Data Analytics Using Python – Project Day Bootcamp</strong> was
+        designed to bridge the gap between academic learning and real-world
+        problem solving.
+      </p>
+      <p class="p">
+        It was inspiring to see students collaborate in teams, work on real
+        datasets, and present meaningful insights using industry-relevant tools.
+        Such hands-on initiatives play a crucial role in shaping future-ready
+        professionals.
+      </p>
+      <p class="p">
+        I truly appreciate the effort of the mentor Mr.Saiakhil, and students
+        who made this bootcamp a success. I am confident that the skills gained
+        here will add strong value to their careers.
+      </p>
+
+      <div class="ceo-sign">
+        <strong>Devika Pakruthi</strong><br>
+        <span>Chief Executive Officer</span><br>
+        <span>ADHOC NETWORK</span>
+      </div>
+    </div>
 </section>
 
     
@@ -824,5 +909,6 @@
 </body>
 
 </html>
+
 
 
